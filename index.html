@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevWord - Sopa de Letras de Desarrollo de Software</title>
+  <meta name="description" content="Juego interactivo de sopa de letras con términos de programación y desarrollo de software.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+
+  <div class="app-container">
+    <!-- Header Area -->
+    <header class="main-header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <i class="fa-solid fa-code"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Dev<span>Games</span></h1>
+          <p id="header-subtitle" class="subtitle">Sopa de Letras &bull; Software Edition</p>
+        </div>
+      </div>
+
+      <!-- Game Switcher Navigation -->
+      <nav class="game-nav-tabs">
+        <button id="tab-sopa" class="game-tab active">
+          <i class="fa-solid fa-border-all"></i>
+          <span>Sopa de Letras</span>
+        </button>
+        <button id="tab-ahorcado" class="game-tab">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>El Ahorcado</span>
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <button id="sound-btn" class="icon-btn" title="Activar/Desactivar Sonido">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <button id="theme-btn" class="icon-btn" title="Cambiar Tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Control & Stats Bar -->
+    <div class="control-panel glass-card">
+      <div class="stats-group">
+        <div class="stat-item" title="Tiempo transcurrido">
+          <i class="fa-regular fa-clock stat-icon"></i>
+          <div class="stat-content">
+            <span class="stat-label">Tiempo</span>
+            <span id="timer-display" class="stat-value">00:00</span>
+          </div>
+        </div>
+
+        <div class="stat-item" title="Estado de progreso">
+          <i id="stat-icon-2" class="fa-solid fa-square-check stat-icon"></i>
+          <div class="stat-content">
+            <span id="stat-label-2" class="stat-label">Encontradas</span>
+            <span id="found-display" class="stat-value">0 / 0</span>
+          </div>
+        </div>
+
+        <div class="stat-item" title="Mejor Tiempo">
+          <i class="fa-solid fa-trophy stat-icon gold"></i>
+          <div class="stat-content">
+            <span class="stat-label">RRecord</span>
+            <span id="best-time-display" class="stat-value">--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions-group">
+        <div class="select-wrapper">
+          <i class="fa-solid fa-layer-group select-icon"></i>
+          <select id="difficulty-select" class="custom-select">
+            <option value="easy">Fácil (10x10)</option>
+            <option value="medium" selected>Medio (12x12)</option>
+            <option value="hard">Difícil (15x15)</option>
+            <option value="timed">Contra el Reloj ⏱️ (5 min)</option>
+          </select>
+        </div>
+
+        <button id="hint-btn" class="btn btn-secondary">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span>Pista</span>
+          <span id="hint-badge" class="badge">3</span>
+        </button>
+
+        <button id="new-game-btn" class="btn btn-primary">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>Nueva Partida</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Game Container: Sopa de Letras -->
+    <main id="sopa-view" class="game-container">
+      <!-- Grid Board Card -->
+      <div class="board-card glass-card">
+        <div class="board-wrapper" id="board-wrapper">
+          <div id="grid-container" class="grid-container"></div>
+          <svg id="selection-canvas" class="selection-canvas"></svg>
+        </div>
+      </div>
+
+      <!-- Words List Card -->
+      <div class="words-card glass-card">
+        <div class="words-header">
+          <h3><i class="fa-solid fa-terminal"></i> Palabras a buscar</h3>
+          <span id="words-progress-percent" class="progress-percent">0%</span>
+        </div>
+        
+        <div class="progress-bar-container">
+          <div id="words-progress-bar" class="progress-bar-fill"></div>
+        </div>
+
+        <div id="word-list" class="word-list-container">
+          <!-- Dynamic word tags inserted here -->
+        </div>
+
+        <div class="legend-info">
+          <p><i class="fa-solid fa-circle-info"></i> Haz clic y arrastra o selecciona el inicio y final para marcar la palabra.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Main Game Container: El Ahorcado -->
+    <main id="ahorcado-view" class="game-container hidden">
+      <!-- Hangman Illustration Card -->
+      <div class="board-card glass-card ahorcado-board">
+        <div class="hangman-container">
+          <svg id="hangman-svg" viewBox="0 0 200 230" class="hangman-canvas">
+            <!-- Gallows Structure -->
+            <line x1="20" y1="210" x2="180" y2="210" class="hg-part base" />
+            <line x1="50" y1="210" x2="50" y2="20" class="hg-part pole" />
+            <line x1="50" y1="20" x2="130" y2="20" class="hg-part beam" />
+            <line x1="50" y1="50" x2="80" y2="20" class="hg-part strut" />
+            <line x1="130" y1="20" x2="130" y2="45" class="hg-part rope" />
+
+            <!-- Stickman Body Parts (Revealed on error) -->
+            <circle cx="130" cy="65" r="20" class="hg-part body-part head hidden-part" />
+            <line x1="130" y1="85" x2="130" y2="145" class="hg-part body-part torso hidden-part" />
+            <line x1="130" y1="100" x2="95" y2="130" class="hg-part body-part arm-left hidden-part" />
+            <line x1="130" y1="100" x2="165" y2="130" class="hg-part body-part arm-right hidden-part" />
+            <line x1="130" y1="145" x2="95" y2="190" class="hg-part body-part leg-left hidden-part" />
+            <line x1="130" y1="145" x2="165" y2="190" class="hg-part body-part leg-right hidden-part" />
+
+            <!-- Dead Face Expression -->
+            <g id="hg-face-dead" class="hg-face hidden-part">
+              <line x1="122" y1="60" x2="128" y2="66" stroke="#ef4444" stroke-width="2.5" />
+              <line x1="128" y1="60" x2="122" y2="66" stroke="#ef4444" stroke-width="2.5" />
+              <line x1="132" y1="60" x2="138" y2="66" stroke="#ef4444" stroke-width="2.5" />
+              <line x1="138" y1="60" x2="132" y2="66" stroke="#ef4444" stroke-width="2.5" />
+              <path d="M 123 75 Q 130 68 137 75" fill="none" stroke="#ef4444" stroke-width="2.5" />
+            </g>
+          </svg>
+        </div>
+
+        <div id="ahorcado-hint-box" class="ahorcado-hint-box">
+          <i class="fa-solid fa-lightbulb hint-icon"></i>
+          <div class="hint-text-wrapper">
+            <span class="hint-title">Pista del Término:</span>
+            <p id="ahorcado-hint-text">Presiona 'Pista' para revelar la pista.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hangman Guessing & Virtual Keyboard Card -->
+      <div class="words-card glass-card ahorcado-panel">
+        <div class="words-header">
+          <h3><i class="fa-solid fa-terminal"></i> Palabra Secreta</h3>
+          <span id="ahorcado-streak" class="progress-percent">Racha: 0</span>
+        </div>
+
+        <div class="related-word-container">
+          <span class="related-label">Relacionado:</span>
+          <span id="ahorcado-related-word" class="related-value">...</span>
+        </div>
+
+        <!-- Hidden Word Slots Container -->
+        <div id="word-slots-container" class="word-slots-container">
+          <!-- Dynamic letter slots inserted here -->
+        </div>
+
+        <!-- Virtual Keyboard -->
+        <div id="virtual-keyboard" class="virtual-keyboard">
+          <!-- Dynamic key buttons generated here -->
+        </div>
+
+        <div class="legend-info">
+          <p><i class="fa-solid fa-keyboard"></i> Haz clic en las teclas o usa tu teclado físico para adivinar las letras.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Victory Modal -->
+  <div id="victory-modal" class="modal-backdrop hidden">
+    <div class="modal-card glass-card">
+      <canvas id="confetti-canvas"></canvas>
+      <div class="modal-header">
+        <div class="trophy-badge">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2>¡Excelente Trabajo!</h2>
+        <p>Has encontrado todas las palabras del código.</p>
+      </div>
+
+      <div class="modal-stats">
+        <div class="modal-stat">
+          <i class="fa-regular fa-clock"></i>
+          <span class="m-label">Tiempo Total</span>
+          <span id="final-time" class="m-value">01:25</span>
+        </div>
+        <div class="modal-stat">
+          <i class="fa-solid fa-sliders"></i>
+          <span class="m-label">Dificultad</span>
+          <span id="final-difficulty" class="m-value">Medio</span>
+        </div>
+        <div class="modal-stat">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span class="m-label">Pistas Usadas</span>
+          <span id="final-hints" class="m-value">1</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modal-restart-btn" class="btn btn-primary btn-lg">
+          <i class="fa-solid fa-play"></i> Jugar Otra Vez
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
